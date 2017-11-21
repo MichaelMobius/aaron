@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - Simple text from json</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+			}
+		</style>
+		</meta>
+		</meta>
+	</head>
+	<body>
+		<div id="info">
+			<!--<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - Simple text from json fonts.-->
+		</div>
+
+<script src="js/three.min.js"></script>
+<script src="js/SVGLoader.js"></script>
+<script src="js/OrbitControls.js"></script>
+<script src="https://threejs.org/examples/js/renderers/CSS3DRenderer.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
+
+<script id=myScript>
+var scene,camera,renderer,rendererSVG,controls,sceneSVG,divSVG;
+var k=0;
+var svglist=['wingdings1.svg','texto.svg'];
+
+init();
+animate();
+
+function init()
+{
+    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 3000);
+    camera.position.set(0, 0, 800);
+
+    scene = new THREE.Scene();
+
+    var light = new THREE.PointLight(0xffffff);
+    light.position.set(0,250,0);
+    scene.add(light);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setClearColor(0xffffff, 1)
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.domElement.style.zIndex = 5;
+    renderer.domElement.style.top = '10px';
+    document.body.appendChild(renderer.domElement);
+    	
+
+    sceneSVG = new THREE.Scene();
+
+    //---get svg file ---
+    var svgLoader = new THREE.SVGLoader().load(svglist[k],
+    function loaded(docSVG)
+    {
+        //----HTML---
+        divSVG= document.createElement('div');
+        divSVG.innerHTML = new XMLSerializer().serializeToString(docSVG);
+
+        var divObj = new THREE.CSS3DObject(divSVG);
+        divObj.position.x = 0;
+        divObj.position.y = 0;
+        divObj.position.z = 0;
+        sceneSVG.add(divObj);
+    })
+
+    rendererSVG = new THREE.CSS3DRenderer();
+    rendererSVG.setSize(window.innerWidth, window.innerHeight);
+    rendererSVG.domElement.style.position = 'absolute';
+    rendererSVG.domElement.style.top = "0px";
+    rendererSVG.domElement.style.left = "0px";
+    document.body.appendChild(rendererSVG.domElement);
+
+
+    controls = new THREE.OrbitControls(camera,rendererSVG.domElement);
+    controls.rotateSpeed = 1.0;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.8;
+
+    window.addEventListener( 'resize', onWindowResize, false );	
+    rendererSVG.domElement.addEventListener( 'click', onClick, false );	
+}
+
+function animate()
+{
+    requestAnimationFrame( animate );
+	render();
+	update();
+}
+
+function update()
+{
+	controls.update();
+}
+
+function onWindowResize() {
+
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+	rendererSVG.setSize(window.innerWidth, window.innerHeight);
+	renderer.setSize( window.innerWidth, window.innerHeight );
+
+}
+
+function selection(k){
+	return svglist[k];
+}
+
+function switchToNext() {
+	
+}
+
+function onClick() {
+
+	switchToNext();
+
+}
+
+function render()
+{
+    renderer.render( scene, camera );
+    rendererSVG.render(sceneSVG, camera);
+}
+
+var body = document.querySelector("body");
+			var cursorArray = ['url("textures/frame_0.cur"), auto',
+                   			   'url("textures/frame_1.cur"), auto',
+                                           'url("textures/frame_2.cur"), auto',
+                                           'url("textures/frame_3.cur"), auto'];
+		        i = 0;
+			(function cursor(){
+			  body.style.cursor  = cursorArray[i];
+			  i++;
+			  if(i == cursorArray.length){
+			    i = 0; 
+			  }
+			   setTimeout(cursor, 150);
+			})();
+
+</script>
+
+</body>
+</html>
